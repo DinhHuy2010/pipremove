@@ -1,0 +1,109 @@
+[tool.poetry]
+name = "pipremove"
+version = "0.0.1"
+description = "Uninstall package recursively."
+authors = ["DinhHuy2010 <huy04052010@outlook.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "pipremove"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+typing-extensions = "^4.12.2"
+attrs = "^24.2.0"
+click = "^8.1.7"
+packaging = "^24.1"
+more-itertools = "^10.5.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+tox = "^4.20.0"
+ruff = "^0.6.7"
+pyright = "^1.1.382.post0"
+coverage = "^7.6.1"
+
+[tool.ruff]
+cache-dir = ".cache/ruff"
+indent-width = 4          # Force 4 spaces per indentation level
+line-length = 120         # Set maximum line length to 100 characters
+
+[tool.ruff.lint]
+# List of error codes to ignore
+# Select specific classes of rules to apply
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "B",
+    "C4",
+    "ARG",
+    "SIM",
+    "PTH",
+    "PL",
+    "TID",
+]
+ignore = [
+    "W291",    # Trailing whitespace
+    "E501",    # Line too long
+    "W293",    # Blank line contains whitespace
+    "PLR0912", # Too many branches
+    "PLR2004", # Magic values
+    "PLR0915", # Too many statements
+    "PLW0603", # Global statement
+    "PLR0913", # Too many arguments
+    "B010",    # setattr
+]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+banned-api."typing".msg = "Use typing_extensions instead"
+
+[tool.pyright]
+# strict for absoulte clean code™
+typeCheckingMode = "strict"
+
+[tool.pytest.ini_options]
+cache_dir = ".cache/pytest"
+addopts = "--verbose --import-mode importlib"
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py{39,310,311}, pyright, ruff
+
+[testenv]
+description = "run tests"
+allowlist_externals = poetry
+commands_pre =
+    poetry install --no-root --sync
+commands = 
+    poetry run coverage run -m pytest
+    poetry run coverage report -m
+
+[testenv:pyright]
+basepython = python3.11
+description = "run pyright (type checking)"
+allowlist_externals = poetry
+commands_pre =
+    poetry install --no-root --sync
+commands:
+    poetry run pyright pipremove/
+
+[testenv:ruff]
+basepython = python3.11
+description = "run ruff (linting)"
+allowlist_externals = poetry
+commands_pre =
+    poetry install --no-root --sync
+commands:
+    poetry run ruff check pipremove/
+"""
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
